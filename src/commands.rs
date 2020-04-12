@@ -4,5 +4,6 @@ use structopt::StructOpt;
 #[structopt(name = "terraformer")]
 pub enum Commands {
     Init,
+    Plan,
     Apply,
 }
