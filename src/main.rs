@@ -1,14 +1,14 @@
-mod options;
+mod commands;
 
 use structopt::StructOpt;
 
-use crate::options::Command;
+use crate::commands::Commands;
 
 fn main() -> anyhow::Result<()> {
-    let command = Command::from_args();
+    let command = Commands::from_args();
     match command {
-        Command::Init => {}
-        Command::Apply => {}
+        Commands::Init => {}
+        Commands::Apply => {}
     }
 
     Ok(())

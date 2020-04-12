@@ -2,7 +2,7 @@ use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "terraformer")]
-pub enum Command {
+pub enum Commands {
     Init,
     Apply,
 }
