@@ -2,16 +2,20 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use crate::prompt::prompt_yes_no;
+use anyhow::bail;
+
+use crate::prompt::prompt_error_yes_no;
 
 fn run_command<P, S>(path: P, command: S) -> anyhow::Result<()>
 where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
+    let path = path.as_ref();
+
     println!(
         "Terraforming {} with {}...",
-        path.as_ref().display(),
+        path.display(),
         command.as_ref()
     );
 
@@ -20,8 +24,12 @@ where
         .args(&[command.as_ref()])
         .status()?
         .success()
+        && !prompt_error_yes_no(
+            format!("Terraform failed in {}, continue?", path.display()),
+            false,
+        )?
     {
-        if !prompt_yes_no("Terraform failed, continue", false)? {}
+        bail!("Terraform failed in {}", path.display());
     }
 
     Ok(())

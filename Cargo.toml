@@ -12,4 +12,5 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0"
+colored = "1.9"
 structopt = "0.3"
