@@ -35,20 +35,21 @@ where
     Ok(())
 }
 
-/// Runs the given terraform command recursively starting in the given directory
-pub fn command_in_dir<P, S>(dir: P, command: S, include_subdirs: bool) -> anyhow::Result<()>
+fn run_command_in_dir<P, S>(dir: P, command: S, include_subdirs: bool) -> anyhow::Result<bool>
 where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
     let mut command_run = false;
+    let mut command_run_subdirs = false;
+
     for entry in fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
 
         if path.is_dir() {
-            if include_subdirs {
-                command_in_dir(&path, command.as_ref(), include_subdirs)?;
+            if include_subdirs && run_command_in_dir(&path, command.as_ref(), include_subdirs)? {
+                command_run_subdirs = true;
             }
             continue;
         }
@@ -65,12 +66,25 @@ where
 
                     // early out if we won't descend into subdirs
                     if !include_subdirs {
-                        return Ok(());
+                        break;
                     }
                 }
             }
             None => continue,
         }
+    }
+
+    Ok(command_run || command_run_subdirs)
+}
+
+/// Runs the given terraform command recursively starting in the given directory
+pub fn command_in_dir<P, S>(dir: P, command: S, include_subdirs: bool) -> anyhow::Result<()>
+where
+    P: AsRef<Path>,
+    S: AsRef<str>,
+{
+    if !run_command_in_dir(dir, command, include_subdirs)? {
+        bail!("No terraform files found!");
     }
 
     Ok(())
