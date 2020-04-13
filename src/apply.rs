@@ -1,5 +1,5 @@
-use crate::run_tf_cmd_in_dir;
+use crate::terraform;
 
 pub fn run() -> anyhow::Result<()> {
-    run_tf_cmd_in_dir(".", "apply")
+    terraform::command_in_dir(".", "apply", true)
 }
