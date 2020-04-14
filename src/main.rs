@@ -1,3 +1,5 @@
+#![deny(warnings)]
+
 mod apply;
 mod commands;
 mod init;

@@ -1,4 +1,4 @@
-use tokio::io::{stdin, stdout, AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::io::{stdin, AsyncBufReadExt, BufReader};
 
 use colored::*;
 
@@ -40,8 +40,13 @@ async fn do_prompt(options: PromptOptions<'_>) -> anyhow::Result<String> {
         None => options.prompt.to_owned(),
     };
 
-    print!("{} ", prompt.color(color));
-    stdout().flush().await?;
+    // print!() or write_all() and flush() don't seem to work
+    //print!("{}", prompt.color(color));
+    /*stdout()
+        .write_all(format!("{} ", prompt.color(color)).as_bytes())
+        .await?;
+    stdout().flush().await?;*/
+    println!("{}", prompt.color(color));
 
     let mut input = String::new();
     let mut reader = BufReader::new(stdin());
