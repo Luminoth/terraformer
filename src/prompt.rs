@@ -1,4 +1,4 @@
-use std::io::{stdin, stdout, Write};
+use tokio::io::{stdin, stdout, AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 use colored::*;
 
@@ -9,7 +9,22 @@ struct PromptOptions<'a> {
 }
 
 impl<'a> PromptOptions<'a> {
+    #[allow(dead_code)]
     pub fn new(prompt: &'a str, hint: Option<&'a str>, color: Option<&'a str>) -> Self {
+        Self {
+            prompt,
+            hint,
+            color,
+        }
+    }
+
+    pub fn yes_no(prompt: &'a str, default_yes: bool, color: Option<&'a str>) -> Self {
+        let hint = Some(if default_yes {
+            "[Yes / no]"
+        } else {
+            "[yes / No]"
+        });
+
         Self {
             prompt,
             hint,
@@ -18,7 +33,7 @@ impl<'a> PromptOptions<'a> {
     }
 }
 
-fn do_prompt(options: PromptOptions) -> anyhow::Result<String> {
+async fn do_prompt(options: PromptOptions<'_>) -> anyhow::Result<String> {
     let color = options.color.unwrap_or("normal");
     let prompt = match options.hint {
         Some(hint) => format!("{} {}", options.prompt, hint),
@@ -26,29 +41,21 @@ fn do_prompt(options: PromptOptions) -> anyhow::Result<String> {
     };
 
     print!("{} ", prompt.color(color));
-    stdout().flush()?;
+    stdout().flush().await?;
 
     let mut input = String::new();
-    stdin().read_line(&mut input)?;
+    let mut reader = BufReader::new(stdin());
+    reader.read_line(&mut input).await?;
     Ok(input)
 }
 
 #[allow(dead_code)]
-pub fn prompt_yes_no<S>(prompt: S, default_yes: bool) -> anyhow::Result<bool>
+pub async fn prompt_yes_no<S>(prompt: S, default_yes: bool) -> anyhow::Result<bool>
 where
     S: AsRef<str>,
 {
-    let options = PromptOptions::new(
-        prompt.as_ref(),
-        Some(if default_yes {
-            "[Yes / no]"
-        } else {
-            "[yes / No]"
-        }),
-        None,
-    );
-
-    Ok(match do_prompt(options)?.to_lowercase().trim() {
+    let options = PromptOptions::yes_no(prompt.as_ref(), default_yes, None);
+    Ok(match do_prompt(options).await?.to_lowercase().trim() {
         "yes" | "y" => true,
         "" => default_yes,
         _ => false,
@@ -56,21 +63,12 @@ where
 }
 
 #[allow(dead_code)]
-pub fn prompt_error_yes_no<S>(prompt: S, default_yes: bool) -> anyhow::Result<bool>
+pub async fn prompt_error_yes_no<S>(prompt: S, default_yes: bool) -> anyhow::Result<bool>
 where
     S: AsRef<str>,
 {
-    let options = PromptOptions::new(
-        prompt.as_ref(),
-        Some(if default_yes {
-            "[Yes / no]"
-        } else {
-            "[yes / No]"
-        }),
-        Some("red"),
-    );
-
-    Ok(match do_prompt(options)?.to_lowercase().trim() {
+    let options = PromptOptions::yes_no(prompt.as_ref(), default_yes, Some("red"));
+    Ok(match do_prompt(options).await?.to_lowercase().trim() {
         "yes" | "y" => true,
         "" => default_yes,
         _ => false,
