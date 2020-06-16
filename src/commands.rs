@@ -9,4 +9,6 @@ pub enum Commands {
     PlanAll,
     Apply,
     ApplyAll,
+    Destroy,
+    DestroyAll,
 }

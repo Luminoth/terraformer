@@ -2,6 +2,7 @@
 
 mod apply;
 mod commands;
+mod destroy;
 mod init;
 mod plan;
 mod prompt;
@@ -21,6 +22,8 @@ async fn main() -> anyhow::Result<()> {
         Commands::PlanAll => plan::run(true).await?,
         Commands::Apply => apply::run(false).await?,
         Commands::ApplyAll => apply::run(true).await?,
+        Commands::Destroy => destroy::run(false).await?,
+        Commands::DestroyAll => destroy::run(true).await?,
     };
 
     Ok(())
