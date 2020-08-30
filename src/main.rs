@@ -6,6 +6,7 @@ mod destroy;
 mod init;
 mod plan;
 mod prompt;
+mod state;
 mod terraform;
 
 use structopt::StructOpt;
@@ -24,6 +25,8 @@ async fn main() -> anyhow::Result<()> {
         Commands::ApplyAll => apply::run(true).await?,
         Commands::Destroy => destroy::run(false).await?,
         Commands::DestroyAll => destroy::run(true).await?,
+        Commands::State { args } => state::run(args, false).await?,
+        Commands::StateAll { args } => state::run(args, true).await?,
     };
 
     Ok(())
