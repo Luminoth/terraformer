@@ -11,6 +11,8 @@ pub enum Commands {
     ApplyAll,
     Destroy,
     DestroyAll,
+    Output,
+    OutputAll,
     State { args: Vec<String> },
     StateAll { args: Vec<String> },
 }
