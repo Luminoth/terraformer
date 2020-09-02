@@ -1,19 +1,12 @@
 #![deny(warnings)]
 
-mod apply;
 mod commands;
-mod destroy;
-mod init;
-mod output;
-mod plan;
 mod prompt;
-mod state;
 mod terraform;
-mod validate;
 
 use structopt::StructOpt;
 
-use crate::commands::Commands;
+use commands::*;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
