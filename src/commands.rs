@@ -15,4 +15,6 @@ pub enum Commands {
     OutputAll,
     State { args: Vec<String> },
     StateAll { args: Vec<String> },
+    Validate { args: Vec<String> },
+    ValidateAll { args: Vec<String> },
 }

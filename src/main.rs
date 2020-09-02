@@ -9,6 +9,7 @@ mod plan;
 mod prompt;
 mod state;
 mod terraform;
+mod validate;
 
 use structopt::StructOpt;
 
@@ -30,6 +31,8 @@ async fn main() -> anyhow::Result<()> {
         Commands::OutputAll => output::run(true).await?,
         Commands::State { args } => state::run(args, false).await?,
         Commands::StateAll { args } => state::run(args, true).await?,
+        Commands::Validate { args } => validate::run(args, false).await?,
+        Commands::ValidateAll { args } => validate::run(args, true).await?,
     };
 
     Ok(())
